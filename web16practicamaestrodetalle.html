@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <table border="1" id="tabladepartamentos">
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Nombre</th>
+                <th>Localidad</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <table border="1" id="tablaempleados">
+        <thead>
+            <tr>
+                <th>Apellido</th>
+                <th>Oficio</th>
+                <th>Salario</th>
+                <th>Departamento</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+
+    <script src="js/jquery-3.6.1.min.js"></script>
+    <script>
+    
+        function cargarDepartamentos() {
+            var url = "https://apicruddepartamentoscore.azurewebsites.net/";       
+            var request = "/api/departamentos";
+            $.ajax({
+                "url": url + request
+                , "method": "GET"
+                , "dataType": "json"
+                , success: function(data){
+                    var html = "";
+                    var cnt=1;
+                   
+                    $.each(data, function(index, dept){
+                     //  console.log("entro");
+                        var id="id"+cnt;
+                        var cod="cod"+cnt;
+                        html += "<tr>";
+                        html += "<td id="+cod+">" + dept.numero + "</td>";
+                        html += "<td>" + dept.nombre + "</td>";
+                        html += "<td>" + dept.localidad + "</td>";
+                        html += "<td id='"+id+"'>" +"</td>";
+                        html += "</tr>";
+                      //  console.log(cod);
+                    cnt ++;
+                    });
+                    $("#tabladepartamentos tbody").html(html);
+                  //  console.log(html);
+                    for(var i=1;i<cnt;i++){
+                      
+                        var cod=$("#cod"+i).text();
+                        console.log("cod="+cod);
+                        var btn=$("<button>",{
+                        "type" :"button",
+                        "html":"Empleado",
+                        "data-codi":cod                  
+                    });
+                        $("#id"+i).append(btn);
+                        btn.click(function(){
+                         var micod=$(this).data("codi");
+                         console.log("micod="+micod);
+                            var url2 = "https://apiempleadosspgs.azurewebsites.net//";       
+                                var request2 = "/api/Empleados/EmpleadosDepartamento/"+micod;
+                            $.ajax({
+                                "url": url2 + request2
+                                , "method": "GET"
+                                , "dataType": "json"
+                                , success: function(data){
+                                    var html = "";                                  
+                                    $.each(data, function(index, emp){
+                                    //  console.log("entro");
+                                        html += "<tr>";
+                                        html += "<td>" + emp.apellido + "</td>";
+                                        html += "<td>" + emp.oficio + "</td>";
+                                        html += "<td>" + emp.salario + "</td>";
+                                        html += "<td>" +emp.departamento+"</td>";
+                                        html += "</tr>";
+                                    
+                                
+                                    });
+                                    $("#tablaempleados tbody").html(html);
+                                }
+                            });
+                        });
+
+                      
+                    }
+                }
+            });
+        }
+
+        function cargarEmpleados(cod){
+            console.log("entro"+ cod);
+            var url = "https://apiempleadosspgs.azurewebsites.net//";       
+            var request = "/api/Empleados/EmpleadosDepartamento/"+cod;
+            $.ajax({
+                "url": url + request
+                , "method": "GET"
+                , "dataType": "json"
+                , success: function(data){
+                    var html = "";                                  
+                    $.each(data, function(index, emp){
+                     //  console.log("entro");
+                        html += "<tr>";
+                        html += "<td>" + emp.apellido + "</td>";
+                        html += "<td>" + emp.oficio + "</td>";
+                        html += "<td>" + emp.salario + "</td>";
+                        html += "<td>" +emp.departamento+"</td>";
+                        html += "</tr>";
+                    });
+                    $("#tablaempleados tbody").html(html);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            cargarDepartamentos();
+        });
+    </script>
+</body>
+</html>
